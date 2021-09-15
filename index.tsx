@@ -1,16 +1,14 @@
-import React, { Component } from 'react';
+import * as React from 'react';
 import { render } from 'react-dom';
-import Hello from './Hello';
+import ExposureWatch from './ExposureWatch';
 import './style.css';
-
-console.log('Hello::', Hello);
 
 interface AppProps {}
 interface AppState {
   name: string;
 }
 
-class App extends Component<any, any> {
+class App extends React.Component<any, any> {
   state = {
     list: []
   };
@@ -33,11 +31,11 @@ class App extends Component<any, any> {
       <div>
         {this.state.list.map((item, index) => {
           return (
-            <Hello>
+            <ExposureWatch>
               <div id={`id_${index}`} key={index} className={`item`}>
                 {item.id}
               </div>
-            </Hello>
+            </ExposureWatch>
           );
         })}
       </div>

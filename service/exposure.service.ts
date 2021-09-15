@@ -1,23 +1,13 @@
 export class ExposureService {
-  public static objectMap: any = {};
-
   public static timer = null;
+  public static watchObjectMap: any = {};
 
-  public static getExposureConditions(element: HTMLElement) {
-    let obj = {
-      lock: false,
-      id: '',
-      count: 0,
-      width: 0,
-      height: 0,
-      top: 0,
-      bottom: 0,
-      condition: 0
-    };
+  // 初始化元素，获取元素自身信息；并存入观测列表
+  public static initExposureCondition(element: HTMLElement) {
     const { clientWidth, clientHeight } = element;
     const { top, bottom } = element.getBoundingClientRect();
 
-    obj = {
+    const obj = {
       lock: false,
       count: 0,
       id: element.id,
@@ -28,17 +18,18 @@ export class ExposureService {
       condition: clientHeight / 2
     };
 
-    if (!ExposureService.objectMap[obj.id]) {
-      ExposureService.objectMap[obj.id] = {};
+    if (!ExposureService.watchObjectMap[obj.id]) {
+      ExposureService.watchObjectMap[obj.id] = {};
     }
 
-    ExposureService.objectMap[obj.id] = obj;
+    ExposureService.watchObjectMap[obj.id] = obj;
   }
 
+  // 观测
   public static watch() {
     clearTimeout(ExposureService.timer);
     ExposureService.timer = setTimeout(() => {
-      for (let item of Object.keys(ExposureService.objectMap)) {
+      for (let item of Object.keys(ExposureService.watchObjectMap)) {
         let {
           id,
           top,
@@ -46,19 +37,21 @@ export class ExposureService {
           condition,
           count,
           lock
-        } = ExposureService.objectMap[item];
-        if (top - window.scrollY < condition && !lock) {
-          ExposureService.objectMap[item].lock = true;
-          ExposureService.objectMap[item].count =
-            ExposureService.objectMap[item].count + 1;
-          console.log(`${id} 可见`, count);
-        }
-        // console.log(id, top + window.scrollY, top + height);
+        } = ExposureService.watchObjectMap[item];
 
-        if (top + window.scrollY > top + height) {
-          ExposureService.objectMap[item].lock = false;
+        // 触发一次后锁定，以防止当前元素在视口内滚动重复触发
+        if (top - window.scrollY < condition && !lock) {
+          ExposureService.watchObjectMap[item].lock = true;
+          ExposureService.watchObjectMap[item].count =
+            ExposureService.watchObjectMap[item].count + 1;
+          // 触发watch
         }
-        console.log(ExposureService.objectMap);
+
+        // 解锁元素，当前元素离开视口时.
+        if (top + window.scrollY > top + height) {
+          ExposureService.watchObjectMap[item].lock = false;
+        }
+        console.log(ExposureService.watchObjectMap);
       }
     }, 100);
   }
