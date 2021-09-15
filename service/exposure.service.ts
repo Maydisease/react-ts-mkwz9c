@@ -49,10 +49,16 @@ export class ExposureService {
         } = ExposureService.objectMap[item];
         if (top - window.scrollY < condition && !lock) {
           ExposureService.objectMap[item].lock = true;
-          // console.log(`${id} 可见`, count);
-          count = count + 1;
+          ExposureService.objectMap[item].count =
+            ExposureService.objectMap[item].count + 1;
+          console.log(`${id} 可见`, count);
         }
-        console.log(id, top - window.scrollY, top + height);
+        // console.log(id, top + window.scrollY, top + height);
+
+        if (top + window.scrollY > top + height) {
+          ExposureService.objectMap[item].lock = false;
+        }
+        console.log(ExposureService.objectMap);
       }
     }, 100);
   }
